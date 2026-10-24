@@ -1,0 +1,190 @@
+[
+  {
+    "id": "h_single_01",
+    "type": "single",
+    "prompt": "What is 347 plus 86?",
+    "expected_calls": [
+      { "name": "add", "args": { "a": 347, "b": 86 } }
+    ],
+    "expected_answer": "433"
+  },
+  {
+    "id": "h_single_02",
+    "type": "single",
+    "prompt": "Calculate 14 multiplied by 26.",
+    "expected_calls": [
+      { "name": "multiply", "args": { "a": 14, "b": 26 } }
+    ],
+    "expected_answer": "364"
+  },
+  {
+  "id": "h_single_03",
+  "type": "single",
+  "prompt": "A jar has 125 marbles. You add 78 more. How many marbles are in the jar now?",
+  "expected_calls": [
+    { "name": "add", "args": { "a": 125, "b": 78 } }
+  ],
+  "expected_answer": "203"
+}
+  ,
+  {
+    "id": "h_single_04",
+    "type": "single",
+    "prompt": "What does my project note say?",
+    "expected_calls": [
+      { "name": "search_notes", "args": { "keyword": "project" } }
+    ],
+    "expected_answer": "Benchmark report draft is due Friday"
+  },
+  {
+    "id": "h_selection_01",
+    "type": "selection",
+    "prompt": "I am checking my saved information for when the Chennai trip is planned.",
+    "expected_calls": [
+      { "name": "search_notes", "args": { "keyword": "travel" } }
+    ],
+    "expected_answer": "12 November"
+  },
+  {
+  "id": "h_selection_02",
+  "type": "selection",
+  "prompt": "What details did I save in my note about the shelves?",
+  "expected_calls": [
+    { "name": "search_notes", "args": { "keyword": "shelves" } }
+  ],
+  "expected_answer": "Each shelf holds 8 books and there are 6 shelves"
+}
+ ,
+  {
+    "id": "h_selection_03",
+    "type": "selection",
+    "prompt": "Find the listed cost of a desk lamp.",
+    "expected_calls": [
+      { "name": "get_price", "args": { "item": "desk lamp" } }
+    ],
+    "expected_answer": "1200"
+  },
+  {
+  "id": "h_chain_01",
+  "type": "chain",
+  "ordered": true,
+  "prompt": "One bundle holds 19 cards. How many cards are in 7 bundles? Then find the total for 5 identical groups of those bundles.",
+  "expected_calls": [
+    { "name": "multiply", "args": { "a": 19, "b": 7 } },
+    { "name": "multiply", "args": { "a": 133, "b": 5 } }
+  ],
+  "expected_answer": "665"
+},
+{
+  "id": "h_chain_02",
+  "type": "chain",
+  "ordered": true,
+  "prompt": "One class brings 48 tickets and another brings 37. A third class brings 15 more. How many tickets are there altogether?",
+  "expected_calls": [
+    { "name": "add", "args": { "a": 48, "b": 37 } },
+    { "name": "add", "args": { "a": 85, "b": 15 } }
+  ],
+  "expected_answer": "100"
+}
+  ,
+  {
+  "id": "h_chain_03",
+  "type": "chain",
+  "ordered": true,
+  "prompt": "Multiply 9 by 11, add 1 to the result, then double it.",
+  "expected_calls": [
+    { "name": "multiply", "args": { "a": 9, "b": 11 } },
+    { "name": "add", "args": { "a": 99, "b": 1 } },
+    { "name": "multiply", "args": { "a": 100, "b": 2 } }
+  ],
+  "expected_answer": "200"
+},
+{
+  "id": "h_chain_04",
+  "type": "chain",
+  "ordered": true,
+  "prompt": "A group has 60 tickets. Add 40 more, then add another 25. What is that total multiplied by 2?",
+  "expected_calls": [
+    { "name": "add", "args": { "a": 60, "b": 40 } },
+    { "name": "add", "args": { "a": 100, "b": 25 } },
+    { "name": "multiply", "args": { "a": 125, "b": 2 } }
+  ],
+  "expected_answer": "250"
+},
+{
+  "id": "h_chain_05",
+  "type": "chain",
+  "ordered": true,
+  "prompt": "Look up the webcam price, calculate the cost for 3 webcams, then add 750 for accessories.",
+  "expected_calls": [
+    { "name": "get_price", "args": { "item": "webcam" } },
+    { "name": "multiply", "args": { "a": 3500, "b": 3 } },
+    { "name": "add", "args": { "a": 10500, "b": 750 } }
+  ],
+  "expected_answer": "11250"
+},
+{
+  "id": "h_chain_06",
+  "type": "chain",
+  "ordered": true,
+  "prompt": "Start with 72 points, add 28, make 3 equal groups of that total, then double the result.",
+  "expected_calls": [
+    { "name": "add", "args": { "a": 72, "b": 28 } },
+    { "name": "multiply", "args": { "a": 100, "b": 3 } },
+    { "name": "multiply", "args": { "a": 300, "b": 2 } }
+  ],
+  "expected_answer": "600"
+},
+  {
+    "id": "h_no_tool_01",
+    "type": "no_tool",
+    "prompt": "How many days are in a week?",
+    "expected_calls": [],
+    "expected_answer": "7"
+  },
+  {
+    "id": "h_no_tool_02",
+    "type": "no_tool",
+    "prompt": "What is the square root of 144?",
+    "expected_calls": [],
+    "expected_answer": "12"
+  },
+  {
+    "id": "h_no_tool_03",
+    "type": "no_tool",
+    "prompt": "Write a polite one-line thank-you note.",
+    "expected_calls": []
+  },
+  {
+    "id": "h_no_tool_04",
+    "type": "no_tool",
+    "prompt": "Give me one synonym for the word happy.",
+    "expected_calls": []
+  },
+  {
+    "id": "h_robust_01",
+    "type": "robustness",
+    "prompt": "How much is a deskk lamp?",
+    "expected_calls": [
+      { "name": "get_price", "args": { "item": "desk lamp" } }
+    ],
+    "expected_answer": "1200"
+  },
+  {
+    "id": "h_robust_02",
+    "type": "robustness",
+    "prompt": "Can you find the price of a VR headset?",
+    "expected_calls": [
+      { "name": "get_price", "args": { "item": "VR headset" } }
+    ]
+  },
+  {
+    "id": "h_robust_03",
+    "type": "robustness",
+    "prompt": "What did I write down about groceris?",
+    "expected_calls": [
+      { "name": "search_notes", "args": { "keyword": "groceries" } }
+    ],
+    "expected_answer": "Buy milk and eggs"
+  }
+]
