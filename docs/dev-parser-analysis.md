@@ -4,7 +4,7 @@
 
 This is an exploratory, call-level analysis of the 360 existing TinyToolBench v4 development outputs. It uses `final_text` from `C:\benchmark\results\results_v4_with_reasons.csv`, the expected calls in `C:\benchmark\tasks.json`, and the current `gateway/parser.py` and `gateway/detector.py`. The source results remain outside this repository. No held-out tasks or results were used.
 
-The parser accepts only a complete JSON object with a non-empty `name` and an object-valued `arguments` field. It does not extract calls from prose, fenced code, or wrapper tags. The schema check verifies tool name, required and extra argument names, and supported argument types. It cannot tell whether a tool call was appropriate for the user's task or whether its values are semantically correct.
+The parser accepts one JSON call candidate in a standalone object, fenced block, or `<tool_call>` wrapper. It recognizes `arguments` or `parameters` when supplied as an object or a JSON string. It does not extract calls from ordinary prose. The schema check verifies tool name, required and extra argument names, and supported argument types. It cannot tell whether a tool call was appropriate for the user's task or whether its values are semantically correct.
 
 ## Results
 
@@ -19,7 +19,7 @@ The parser accepts only a complete JSON object with a non-empty `name` and an ob
 | Calls accepted by schema validation | 60 | 36 exact calls, 9 wrong first calls, and 15 calls on no-tool tasks |
 | Calls rejected by schema validation | 3 | All were `{"name": "None", "arguments": {}}` on qwen2.5-coder:7b task n2, runs 1–3 |
 
-Among the 45 parsed calls from tasks that expected a tool, 36 (80%) exactly match the expected first call. The parser also extracts a call from 18 of the 72 no-tool attempts (25%). Schema validation rejects the three unknown-tool `None` calls, but accepts the other 15 calls from no-tool attempts. It also accepts the 9 wrong first calls because their names and argument types fit a tool schema.
+Among the 45 parsed calls from tasks that expected a tool, 36 (80%) exactly match the expected first call. The parser also extracts a call from 18 of the 72 no-tool attempts (25%). Schema validation rejects the three unknown-tool `None` calls, but accepts the other 15 calls from no-tool attempts. It also accepts the 9 wrong first calls because their names and argument types fit a tool schema. The expanded parser was rerun on the same 360 development outputs; these counts did not change.
 
 ## What this says
 
