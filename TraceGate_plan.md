@@ -109,6 +109,8 @@ The scored transcript contains only calls the gateway **forwards to the runner**
 | 8 | **Analyze** | Per arm vs A0: tasks won / lost / tied, with a per-task flip list labeled by category. Pass counts with Wilson intervals. Retries per task, added tokens and wall-clock, repaired-but-still-failed rate, **no-tool-task regressions**. No significance claims | Shows effect, cost, and harm |
 | 9 | **Write up and stop** | Finding first, cite section 1, state limitations | The README is what recruiters read |
 
+**Progress note (2026-10-27):** The development-only A0 equivalence check matched direct pass/fail outcomes for six no-tool and single-tool model/task pairs. A short chain check also matched for Qwen3 1.7B, but the chain check timed out for Qwen3 4B and was not completed for the coder model. See [`docs/dev-equivalence-check.md`](docs/dev-equivalence-check.md). Treat this as partial evidence; the holdout is still unused, and the gateway is not frozen.
+
 **Cut list:** no UI, auth, Docker, streaming, dashboard.
 **Scope cutoff:** if step 2 shows semantic failures dominate and step 5 shows parsing recovers little, drop A2/A3 and ship A0/A1 with the negative result.
 
