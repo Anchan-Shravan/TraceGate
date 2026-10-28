@@ -79,12 +79,20 @@ def create_app(
     trace_path: str | Path = "logs/trace.jsonl",
     transport: httpx.AsyncBaseTransport | None = None,
     arm: str | None = None,
+    upstream_timeout: float | None = None,
 ) -> FastAPI:
     app = FastAPI()
     trace_file = Path(trace_path)
     selected_arm = (arm or os.getenv("TRACEGATE_ARM", "A0")).upper()
     if selected_arm not in VALID_ARMS:
         raise ValueError(f"Unknown TraceGate arm {selected_arm!r}; choose A0, A1, A2, or A3.")
+    timeout_seconds = (
+        upstream_timeout
+        if upstream_timeout is not None
+        else float(os.getenv("TRACEGATE_UPSTREAM_TIMEOUT", "600"))
+    )
+    if timeout_seconds <= 0:
+        raise ValueError("The Ollama upstream timeout must be greater than zero seconds.")
 
     def write_trace(record: dict) -> None:
         trace_file.parent.mkdir(parents=True, exist_ok=True)
@@ -124,7 +132,7 @@ def create_app(
             return JSONResponse(status_code=400, content={"detail": trace["errors"][0]})
 
         try:
-            async with httpx.AsyncClient(transport=transport, timeout=180.0) as client:
+            async with httpx.AsyncClient(transport=transport, timeout=timeout_seconds) as client:
                 upstream = await client.post(
                     f"{upstream_url.rstrip('/')}/api/chat",
                     content=request_body,

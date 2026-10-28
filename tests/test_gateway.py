@@ -61,3 +61,32 @@ def test_chat_forwards_tool_messages_and_writes_trace(tmp_path):
     assert json.loads(trace["request_body"]) == chat_request
     assert json.loads(trace["response_body"]) == upstream_response
     assert trace["status_code"] == 200
+
+
+def test_chat_uses_configured_upstream_timeout(tmp_path, monkeypatch):
+    seen_timeouts = []
+    monkeypatch.setenv("TRACEGATE_UPSTREAM_TIMEOUT", "600")
+
+    def fake_ollama(request):
+        seen_timeouts.append(request.extensions["timeout"]["read"])
+        return httpx.Response(
+            200,
+            json={"model": "test-model", "message": {"role": "assistant", "content": "Done."}},
+        )
+
+    from gateway.app import create_app
+
+    app = create_app(
+        upstream_url="http://ollama.test",
+        trace_path=tmp_path / "trace.jsonl",
+        transport=httpx.MockTransport(fake_ollama),
+    )
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/api/chat",
+            json={"model": "test-model", "stream": False, "messages": []},
+        )
+
+    assert response.status_code == 200
+    assert seen_timeouts == [600.0]

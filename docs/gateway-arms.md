@@ -27,3 +27,15 @@ $env:TRACEGATE_ARM = "A3"
 Replace `A3` with `A0`, `A1`, or `A2` to choose another arm. Stop the server with **Ctrl+C** before changing arms and starting it again. If the variable is not set, the gateway uses A0.
 
 The app factory also accepts `arm="A1"` directly, which is useful for automated tests. This implementation is not frozen yet; run the planned development equivalence and live checks before creating the `gateway-frozen` tag.
+
+## Ollama response timeout
+
+The gateway waits up to **600 seconds (10 minutes)** for each Ollama response by default. This is longer than the earlier 180-second limit, which was too short for some multi-step runs on slower local models.
+
+To choose a different limit in PowerShell, set the variable before starting Uvicorn:
+
+```powershell
+$env:TRACEGATE_UPSTREAM_TIMEOUT = "900"
+```
+
+The value is in seconds. For example, `900` means 15 minutes. The setting applies to each request to Ollama, including a corrective retry. Set it in the same terminal window where you start the server.
