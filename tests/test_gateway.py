@@ -1,6 +1,7 @@
 import json
 
 import httpx
+import pytest
 from fastapi.testclient import TestClient
 
 
@@ -90,3 +91,63 @@ def test_chat_uses_configured_upstream_timeout(tmp_path, monkeypatch):
 
     assert response.status_code == 200
     assert seen_timeouts == [600.0]
+
+
+@pytest.mark.parametrize("timeout_value", ["0", "-5", "nan", "not-a-number"])
+def test_rejects_invalid_upstream_timeout(timeout_value, monkeypatch):
+    monkeypatch.setenv("TRACEGATE_UPSTREAM_TIMEOUT", timeout_value)
+
+    from gateway.app import create_app
+
+    with pytest.raises(ValueError, match="finite number greater than zero"):
+        create_app()
+
+
+def test_trace_names_upstream_timeout_error(tmp_path):
+    def timed_out(_request):
+        raise httpx.ReadTimeout("mock upstream timed out")
+
+    from gateway.app import create_app
+
+    app = create_app(
+        upstream_url="http://ollama.test",
+        trace_path=tmp_path / "trace.jsonl",
+        transport=httpx.MockTransport(timed_out),
+    )
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/api/chat",
+            json={"model": "test-model", "stream": False, "messages": []},
+        )
+
+    trace = json.loads((tmp_path / "trace.jsonl").read_text(encoding="utf-8"))
+    assert response.status_code == 502
+    assert trace["errors"] == ["ReadTimeout: mock upstream timed out"]
+
+
+def test_chat_preserves_upstream_http_error_and_traces_it(tmp_path):
+    error_body = {"error": "model is temporarily unavailable"}
+
+    def unavailable(_request):
+        return httpx.Response(503, json=error_body)
+
+    from gateway.app import create_app
+
+    app = create_app(
+        upstream_url="http://ollama.test",
+        trace_path=tmp_path / "trace.jsonl",
+        transport=httpx.MockTransport(unavailable),
+    )
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/api/chat",
+            json={"model": "test-model", "stream": False, "messages": []},
+        )
+
+    trace = json.loads((tmp_path / "trace.jsonl").read_text(encoding="utf-8"))
+    assert response.status_code == 503
+    assert response.json() == error_body
+    assert trace["status_code"] == 503
+    assert json.loads(trace["response_body"]) == error_body

@@ -1,4 +1,5 @@
 import json
+import math
 import os
 import time
 from datetime import datetime, timezone
@@ -86,13 +87,21 @@ def create_app(
     selected_arm = (arm or os.getenv("TRACEGATE_ARM", "A0")).upper()
     if selected_arm not in VALID_ARMS:
         raise ValueError(f"Unknown TraceGate arm {selected_arm!r}; choose A0, A1, A2, or A3.")
-    timeout_seconds = (
+    raw_timeout = (
         upstream_timeout
         if upstream_timeout is not None
-        else float(os.getenv("TRACEGATE_UPSTREAM_TIMEOUT", "600"))
+        else os.getenv("TRACEGATE_UPSTREAM_TIMEOUT", "600")
     )
-    if timeout_seconds <= 0:
-        raise ValueError("The Ollama upstream timeout must be greater than zero seconds.")
+    try:
+        timeout_seconds = float(raw_timeout)
+    except (TypeError, ValueError) as error:
+        raise ValueError(
+            "The Ollama upstream timeout must be a finite number greater than zero seconds."
+        ) from error
+    if not math.isfinite(timeout_seconds) or timeout_seconds <= 0:
+        raise ValueError(
+            "The Ollama upstream timeout must be a finite number greater than zero seconds."
+        )
 
     def write_trace(record: dict) -> None:
         trace_file.parent.mkdir(parents=True, exist_ok=True)
@@ -235,7 +244,10 @@ def create_app(
                     trace["raw_response_body"] = upstream.text
 
         except httpx.HTTPError as error:
-            trace["errors"].append(str(error))
+            error_detail = type(error).__name__
+            if str(error):
+                error_detail += f": {error}"
+            trace["errors"].append(error_detail)
             trace["response_body"] = json.dumps({"detail": "Ollama upstream request failed."})
             trace["status_code"] = 502
             trace["latency_ms"] = round((time.perf_counter() - started) * 1000, 2)

@@ -39,3 +39,5 @@ $env:TRACEGATE_UPSTREAM_TIMEOUT = "900"
 ```
 
 The value is in seconds. For example, `900` means 15 minutes. The setting applies to each request to Ollama, including a corrective retry. Set it in the same terminal window where you start the server.
+
+The value must be a finite number greater than zero. If Ollama times out or cannot be reached, TraceGate returns a `502` response; its local trace records the error type (such as `ReadTimeout`) and message to help explain what happened. If Ollama itself returns an HTTP error, TraceGate passes that status and response body back to the caller and records them in the trace.
