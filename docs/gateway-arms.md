@@ -9,7 +9,7 @@ TraceGate can run one of four modes (called “arms” in the plan). A0 remains 
 | A2 | Checks native structured tool calls against the offered schemas. If a native call is invalid, asks the model once to correct it. It does not convert text calls. |
 | A3 | Combines A1 and A2, and also retries a detected invalid text call once. It converts the retry if that retry contains one valid text call. |
 
-The same fixed retry template includes the validation errors and offered tool schemas. A retry adds the invalid assistant message and one corrective user message to the original request, keeping its model and other generation settings. Trace logs record the original response, final response, classification, action, errors, retry count, and total latency.
+The same fixed retry template includes the validation errors and offered tool schemas. A retry adds the invalid assistant message and one corrective user message to the original request, keeping its model and other generation settings. Trace logs record the original response, final response, classification, action, errors, retry count, and total latency. If Ollama returns an HTTP error for the retry, the gateway forwards that status and body and marks the trace action with `_then_upstream_error` plus the retry status.
 
 Plain prose is not treated as a call, even when it mentions a function such as `add(2, 3)`. A text call must be a JSON object, a fenced JSON block, or a `<tool_call>` block with a name and arguments/parameters. A malformed call-shaped JSON block, unknown tool, schema error, or multiple candidates is classified as invalid. At most one retry is made for a model turn. If the retry remains invalid, its response is forwarded unchanged.
 

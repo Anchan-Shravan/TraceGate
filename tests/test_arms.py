@@ -118,6 +118,44 @@ def test_a2_retries_invalid_native_call_once(tmp_path):
     assert trace["final_classification"] == "N-valid"
 
 
+def test_a2_traces_retry_upstream_http_error(tmp_path):
+    responses = [
+        httpx.Response(
+            200,
+            json=ollama_response(
+                {
+                    "role": "assistant",
+                    "content": "",
+                    "tool_calls": [{"function": {"name": "add", "arguments": {"a": 2}}}],
+                }
+            ),
+        ),
+        httpx.Response(503, json={"error": "model is temporarily unavailable"}),
+    ]
+
+    def fake_ollama(_request):
+        return responses.pop(0)
+
+    app = create_app(
+        upstream_url="http://ollama.test",
+        trace_path=tmp_path / "trace.jsonl",
+        transport=httpx.MockTransport(fake_ollama),
+        arm="A2",
+    )
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/api/chat",
+            json={"model": "test-model", "stream": False, "tools": ADD_TOOLS, "messages": []},
+        )
+
+    trace = json.loads((tmp_path / "trace.jsonl").read_text(encoding="utf-8"))
+    assert response.status_code == 503
+    assert response.json() == {"error": "model is temporarily unavailable"}
+    assert trace["action"] == "retried_native_invalid_then_upstream_error"
+    assert "Retry returned HTTP 503." in trace["errors"]
+
+
 def test_a3_retries_invalid_text_call_and_converts_valid_retry(tmp_path):
     requests_seen = []
     responses = [

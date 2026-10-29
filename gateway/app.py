@@ -235,6 +235,11 @@ def create_app(
                                     trace["errors"].extend(
                                         f"Retry: {error}" for error in retry_errors
                                     )
+                        else:
+                            trace["action"] += "_then_upstream_error"
+                            trace["errors"].append(
+                                f"Retry returned HTTP {retry.status_code}."
+                            )
 
                 trace["status_code"] = final_status_code
                 trace["response_body"] = final_response_body.decode(
