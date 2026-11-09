@@ -22,9 +22,11 @@
 
 Across the six model/task pairs, the two direct runs agreed on pass/fail in **6/6**, and A0 matched each direct run on pass/fail in **6/6**. This small sample found no A0-induced pass/fail change.
 
-The A0 trace contains **8 successful request/response hops** for the sampled no-tool and one-tool tasks. All eight returned status 200 and the response body recorded from Ollama exactly matched the body A0 returned.
+The A0 trace contains **8 successful request/response hops** for the sampled no-tool and one-tool tasks. All eight returned status 200, and the response body recorded from Ollama exactly matched the body A0 returned.
 
-The extra `c1` check for `qwen3:1.7b` failed the checker in both direct runs and through A0, so those three outcomes also agreed. The `qwen3:4b` `c1` direct attempt exceeded the 300-second client timeout. Its A0 attempt hit the gateway's 180-second upstream timeout and was recorded as a 502. That chain pair is excluded from the six-pair result above. The longer `c4` chain was also too slow to include. The chain check is therefore incomplete for the 4B and coder models, and A0's timeout needs review before freezing the gateway.
+The extra `c1` check for `qwen3:1.7b` failed the checker in both direct runs and through A0, so those three outcomes also agreed. The `qwen3:4b` direct `c1` attempt exceeded the 300-second client timeout. Its A0 attempt hit the gateway's then-current 180-second upstream timeout and was recorded as a 502. That chain pair is excluded from the six-pair result above. The longer `c4` chain was also too slow to include.
+
+After this experiment, the gateway's default upstream timeout was increased to 600 seconds. The slow chain comparison has not been rerun with that setting, so chain evidence remains incomplete for the 4B and coder models.
 
 ## Runtime and model identity
 
@@ -44,4 +46,4 @@ The extra `c1` check for `qwen3:1.7b` failed the checker in both direct runs and
 
 This is an exploratory equivalence check, not a general proof that the gateway never changes outputs. It covers two short development tasks per model and one extra chain task for one model. The results support continuing A0-based development for these sampled cases, but the slow chain cases still need a practical run protocol before the gateway is frozen. The holdout remains unused.
 
-The raw local run record is `logs/dev_equivalence_20261027.json` and the gateway request trace is `logs/trace.jsonl`; both are ignored by Git because they can contain full model responses.
+The raw local run record is `logs/dev_equivalence_20261027.json`, and the gateway request trace is `logs/trace.jsonl`; both are ignored by Git because they can contain full model responses.
