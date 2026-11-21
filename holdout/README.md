@@ -25,7 +25,9 @@ Run the checker from the TraceGate project folder:
 
 ```powershell
 python .\holdout\verify_holdout.py
+```
+
 ## Held-out task fingerprint
 
-SHA-256 of `tasks.json`: `<55321566A58DD6AB647A328C7171CDE02B2500BB035D45ED333ED281419509DC  >`
+SHA-256 of `tasks.json`: `55321566A58DD6AB647A328C7171CDE02B2500BB035D45ED333ED281419509DC`
 
