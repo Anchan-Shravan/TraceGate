@@ -37,6 +37,25 @@ The benchmark runner now stores its own `runner_sha256` in new run metadata alon
 
 The gateway, parser, detector, and four intervention modes are implemented. The development-only A0 comparison and failure review are documented under `docs/`. The holdout validator passes, and the automated checks pass (24 TraceGate tests and 15 TinyToolBench tests at the time of freeze).
 
-**The held-out model experiment has not been run yet.** The previously installed models include `qwen3:4b` and `qwen2.5-coder:7b`; the planned `qwen3:1.7b` and `qwen3:8b` models were not installed at the freeze check. Do not present the project as having measured which intervention is best until the planned runs and analysis are complete.
+## Preliminary held-out baseline (2026-11-22)
+
+One A0 pass-through run was completed for all 20 held-out tasks using `qwen3:4b` (one run per task).
+
+| Task category | Passed |
+|---|---:|
+| Single-call | 4 / 4 |
+| Tool selection | 2 / 3 |
+| Chains | 1 / 6 |
+| No-tool | 4 / 4 |
+| Robustness | 2 / 3 |
+| **Overall** | **13 / 20** |
+
+Five tasks returned normally but failed the checker. Two more ended with gateway `502` errors and were counted as failures. For the 18 normally returned tasks, recorded task time totaled 2,511.33 seconds (mean 139.52 seconds; median 75.39 seconds). The runner records zero elapsed seconds for exception rows, so this is not the full wall-clock cost of the run.
+
+This is a **partial, exploratory result**, not the planned experiment: it covers one model, one arm, and one run per task. The run used temperature `0` and Qwen3 `think=false`, but the runner did not set a fixed seed. The benchmark metadata also could not query model details through the A0 gateway; a direct Ollama tags query identified the model digest as `359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7` (Ollama server `0.40.16`). Because the fixed-seed requirement was not met and A1-A3 were not run, these numbers do not show whether gateway interventions help.
+
+The raw CSV and full response traces stay in the ignored local folder `logs/holdout_runs/20261122/A0_qwen3_4b/`; they are not committed because they contain full model responses. The other planned models `qwen3:1.7b` and `qwen3:8b` were not installed during this run.
+
+Do not change gateway or checker rules based on these holdout results. Complete any remaining comparison under the frozen rules and report this seed and timeout limitation with the findings.
 
 The full plan, including run order and analysis measures, is in [`TraceGate_plan.md`](TraceGate_plan.md).
