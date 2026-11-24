@@ -33,9 +33,11 @@ Ollama and TraceGate run locally. The gateway can pass a reply through, convert 
 
 The benchmark runner now stores its own `runner_sha256` in new run metadata alongside task and tool hashes. The runner version used for this freeze is TinyToolBench commit `6cd30337e27a6402d8c02b6a83df83fd057bf981`.
 
-## Current status
+## Project status (2026-11-24)
 
-The gateway, parser, detector, and four intervention modes are implemented. The development-only A0 comparison and failure review are documented under `docs/`. The holdout validator passes, and the automated checks pass (24 TraceGate tests and 15 TinyToolBench tests at the time of freeze).
+The initial implementation milestone is complete: the gateway, parser, detector, and four intervention modes are implemented and frozen. The development-only A0 comparison and failure review are documented under `docs/`. The holdout validator passed, and the automated checks passed at the freeze point (24 TraceGate tests and 15 TinyToolBench tests).
+
+The full evaluation is **not complete**. The only held-out result so far is the preliminary A0 run below. It does not compare A0 with A1-A3, and it does not establish that an intervention helps. No gateway or checker rules were changed based on this result.
 
 ## Preliminary held-out baseline (2026-11-22)
 
@@ -56,6 +58,6 @@ This is a **partial, exploratory result**, not the planned experiment: it covers
 
 The raw CSV and full response traces stay in the ignored local folder `logs/holdout_runs/20261122/A0_qwen3_4b/`; they are not committed because they contain full model responses. The other planned models `qwen3:1.7b` and `qwen3:8b` were not installed during this run.
 
-Do not change gateway or checker rules based on these holdout results. Complete any remaining comparison under the frozen rules and report this seed and timeout limitation with the findings.
+The original held-out set has now been used for this A0 run. Do not use it to develop or tune gateway or checker rules, and do not present this one-arm result as the final comparison. The planned next evaluation is a separately authored, independently frozen 20-task set with a recorded fixed seed. It is planned to include the original model matrix plus Llama 3.1 8B and FunctionGemma 270M as additional models; these runs have not started, and the added models have not been downloaded. The new task file must remain unpublished until its evaluation is complete.
 
 The full plan, including run order and analysis measures, is in [`TraceGate_plan.md`](TraceGate_plan.md).
